@@ -7,18 +7,28 @@ class ExpenseListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final items = ExpenseRepository.getAll().reversed.toList(); // newest first
     return Scaffold(
       appBar: AppBar(title: const Text('Expenses')),
-      body: items.isEmpty
-          ? const Center(child: Text('No expenses yet'))
-          : ListView.builder(
-        itemCount: items.length,
-        itemBuilder: (context, index) {
-          final e = items[index];
-          return ExpenseCard(expense: e);
+      body: FutureBuilder(
+        future: ExpenseRepository.getAll(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          final items = snapshot.data ?? [];
+          if (items.isEmpty) {
+            return const Center(child: Text('No expenses yet'));
+          }
+          return ListView.builder(
+            itemCount: items.length,
+            itemBuilder: (context, index) {
+              final e = items[index];
+              return ExpenseCard(expense: e);
+            },
+          );
         },
       ),
     );
   }
 }
+

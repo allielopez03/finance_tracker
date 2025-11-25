@@ -34,12 +34,19 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     if (picked != null) setState(() => _date = picked);
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (_formKey.currentState?.validate() ?? false) {
       final amount = double.tryParse(_amountCtrl.text) ?? 0.0;
-      final e = Expense(amount: amount, category: _category, description: _descCtrl.text, date: _date);
-      ExpenseRepository.add(e);
-      Navigator.pop(context);
+      final e = Expense(
+        amount: amount,
+        category: _category,
+        description: _descCtrl.text,
+        date: _date,
+      );
+
+      await ExpenseRepository.add(e); // Save to Firestore
+
+      if (mounted) Navigator.pop(context);
     }
   }
 
@@ -56,8 +63,9 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
             children: [
               TextFormField(
                 controller: _amountCtrl,
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                decoration: const InputDecoration(labelText: 'Amount', prefixText: '\$'),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                decoration: const InputDecoration(
+                    labelText: 'Amount', prefixText: '\$'),
                 validator: (v) {
                   if (v == null || v.isEmpty) return 'Enter amount';
                   if (double.tryParse(v) == null) return 'Enter valid number';
@@ -71,7 +79,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
               DropdownButtonFormField<String>(
                 value: _category,
                 items: ['Food','Transport','Bills','Entertainment','Other']
-                    .map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
+                    .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                    .toList(),
                 onChanged: (v) => setState(() { _category = v ?? 'Food'; }),
                 decoration: const InputDecoration(labelText: 'Category'),
               ),
@@ -91,3 +100,6 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     );
   }
 }
+
+
+

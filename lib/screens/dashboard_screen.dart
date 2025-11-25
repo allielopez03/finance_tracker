@@ -14,11 +14,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
   double todayTotal = 0;
   double weekTotal = 0;
 
-  void _refreshTotals() {
+  Future<void> _refreshTotals() async {
     final now = DateTime.now();
+    final today = await ExpenseRepository.totalForDay(now);
+    final week = await ExpenseRepository.totalForWeek(now);
     setState(() {
-      todayTotal = ExpenseRepository.totalForDay(now);
-      weekTotal = ExpenseRepository.totalForWeek(now);
+      todayTotal = today;
+      weekTotal = week;
     });
   }
 
@@ -37,7 +39,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
           IconButton(
             icon: const Icon(Icons.list),
             onPressed: () async {
-              await Navigator.push(context, MaterialPageRoute(builder: (_) => const ExpenseListScreen()));
+              await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => const ExpenseListScreen()));
               _refreshTotals();
             },
           ),
@@ -45,7 +50,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          await Navigator.push(context, MaterialPageRoute(builder: (_) => const AddExpenseScreen()));
+          await Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => const AddExpenseScreen()));
           _refreshTotals();
         },
         child: const Icon(Icons.add),
@@ -81,7 +89,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       icon: const Icon(Icons.add_shopping_cart),
                       label: const Text('Add Expense'),
                       onPressed: () async {
-                        await Navigator.push(context, MaterialPageRoute(builder: (_) => const AddExpenseScreen()));
+                        await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const AddExpenseScreen()));
                         _refreshTotals();
                       },
                     ),
@@ -90,7 +101,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       icon: const Icon(Icons.receipt_long),
                       label: const Text('View All'),
                       onPressed: () async {
-                        await Navigator.push(context, MaterialPageRoute(builder: (_) => const ExpenseListScreen()));
+                        await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const ExpenseListScreen()));
                         _refreshTotals();
                       },
                     ),
@@ -104,3 +118,5 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 }
+
+
